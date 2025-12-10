@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZIP Correct Score Calculator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Header -->
+        <header>
+            <h1>ZIP Correct Score Calculator</h1>
+            <p class="subtitle">Zero-Inflated Poisson Model for Football Odds Modelling</p>
+        </header>
+
+        <div class="app-layout">
+            
+            <!-- Left Panel: Inputs -->
+            <aside class="input-panel">
+                
+                <!-- Match Info -->
+                <div class="section">
+                    <h3>Match Info</h3>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>Home Team</label>
+                            <input type="text" id="homeTeam" value="Home Team">
+                        </div>
+                        <div class="input-group">
+                            <label>Away Team</label>
+                            <input type="text" id="awayTeam" value="Away Team">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Mode -->
+                <div class="section">
+                    <h3>Input Mode</h3>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="inputMode" value="xg" checked>
+                            Mode A: xG Inputs
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="inputMode" value="sup">
+                            Mode B: Supremacy & Total
+                        </label>
+                    </div>
+
+                    <!-- Mode A Inputs -->
+                    <div id="modeA-container" class="mode-container active">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Home xG (λ)</label>
+                                <input type="number" id="xgHome" step="0.01" value="1.60">
+                            </div>
+                            <div class="input-group">
+                                <label>Away xG (λ)</label>
+                                <input type="number" id="xgAway" step="0.01" value="1.10">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode B Inputs -->
+                    <div id="modeB-container" class="mode-container">
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label title="Exp. Home Goals - Exp. Away Goals">Supremacy</label>
+                                <input type="number" id="supremacy" step="0.01" value="0.50">
+                            </div>
+                            <div class="input-group">
+                                <label title="Total Expected Goals">Total Exp.</label>
+                                <input type="number" id="expectancy" step="0.01" value="2.70">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Parameters -->
+                <div class="section">
+                    <h3>Model Parameters</h3>
+                    
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="useZip"> Use Zero-Inflated Model
+                        </label>
+                    </div>
+
+                    <div id="zip-inputs" class="input-row disabled">
+                        <div class="input-group">
+                            <label>Home π (0-1)</label>
+                            <input type="number" id="piHome" step="0.01" min="0" max="1" value="0.00" disabled>
+                        </div>
+                        <div class="input-group">
+                            <label>Away π (0-1)</label>
+                            <input type="number" id="piAway" step="0.01" min="0" max="1" value="0.00" disabled>
+                        </div>
+                    </div>
+
+                    <div class="input-group" style="margin-top: 10px;">
+                        <label>Halves Scaling Factor</label>
+                        <input type="number" id="halfFactor" step="0.01" min="0.3" max="0.7" value="0.50">
+                    </div>
+                </div>
+
+                <!-- Margin -->
+                <div class="section">
+                    <h3>Market Settings</h3>
+                    <div class="input-group">
+                        <label>Bookmaker Margin %</label>
+                        <input type="number" id="marginPct" step="0.5" value="6.0">
+                    </div>
+                </div>
+
+                <!-- Error Display -->
+                <div id="error-box" class="error-box hidden"></div>
+
+                <button id="calcBtn" class="primary-btn">Calculate</button>
+
+            </aside>
+
+            <!-- Right Panel: Results -->
+            <main class="results-panel">
+                
+                <!-- Key Markets Summary -->
+                <div class="summary-card">
+                    <div class="market-column">
+                        <h4>1X2 (Full Time)</h4>
+                        <div id="summary-1x2" class="market-list"></div>
+                    </div>
+                    <div class="market-column">
+                        <h4>Over/Under 2.5 (Full Time)</h4>
+                        <div id="summary-ou" class="market-list"></div>
+                    </div>
+                    <div class="market-column">
+                        <h4>BTTS (Full Time)</h4>
+                        <div id="summary-btts" class="market-list"></div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="full">Full Time</button>
+                    <button class="tab-btn" data-tab="h1">1st Half</button>
+                    <button class="tab-btn" data-tab="h2">2nd Half</button>
+                </div>
+
+                <!-- Tab Content: Full Time -->
+                <div id="tab-full" class="tab-content active">
+                    <div class="market-grid-layout">
+                        <div class="grid-section">
+                            <h5>Correct Score Grid (Full Time)</h5>
+                            <div class="warning-text" id="warning-full"></div>
+                            <div class="table-scroll">
+                                <table id="cs-grid-full" class="cs-table"></table>
+                            </div>
+                            <div id="selected-score-full" class="selection-panel hidden">
+                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
+                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
+                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
+                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+                            </div>
+                        </div>
+                        <div class="side-markets">
+                            <h5>Additional Markets</h5>
+                            <div id="markets-full" class="market-dump"></div>
+                            <h5>Exact Goals</h5>
+                            <table id="goals-full" class="simple-table"></table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: 1st Half -->
+                <div id="tab-h1" class="tab-content">
+                    <div class="market-grid-layout">
+                        <div class="grid-section">
+                            <h5>Correct Score Grid (1st Half)</h5>
+                            <div class="warning-text" id="warning-h1"></div>
+                            <div class="table-scroll">
+                                <table id="cs-grid-h1" class="cs-table"></table>
+                            </div>
+                            <div id="selected-score-h1" class="selection-panel hidden">
+                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
+                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
+                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
+                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+                            </div>
+                        </div>
+                        <div class="side-markets">
+                            <h5>Half Time Markets</h5>
+                            <div id="markets-h1" class="market-dump"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Content: 2nd Half -->
+                <div id="tab-h2" class="tab-content">
+                    <div class="market-grid-layout">
+                        <div class="grid-section">
+                            <h5>Correct Score Grid (2nd Half)</h5>
+                            <div class="warning-text" id="warning-h2"></div>
+                            <div class="table-scroll">
+                                <table id="cs-grid-h2" class="cs-table"></table>
+                            </div>
+                            <div id="selected-score-h2" class="selection-panel hidden">
+                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
+                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
+                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
+                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+                            </div>
+                        </div>
+                        <div class="side-markets">
+                            <h5>2nd Half Markets</h5>
+                            <div id="markets-h2" class="market-dump"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
