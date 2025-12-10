@@ -1,0 +1,366 @@
+:root {
+    --bg-color: #f4f6f8;
+    --card-bg: #ffffff;
+    --primary-color: #2563eb;
+    --primary-hover: #1d4ed8;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --error-color: #ef4444;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    
+    --table-header-bg: #f8fafc;
+    --cell-hover: #e0f2fe;
+    --cell-selected: #bfdbfe;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+/* Layout */
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.app-layout {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+/* Input Panel */
+.input-panel {
+    flex: 1;
+    min-width: 300px;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.section {
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid var(--border-color);
+}
+
+.section h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 8px;
+}
+
+.input-row {
+    display: flex;
+    gap: 12px;
+}
+
+.input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--text-muted);
+}
+
+.input-group input[type="text"],
+.input-group input[type="number"] {
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.radio-label {
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.mode-container {
+    display: none;
+}
+
+.mode-container.active {
+    display: block;
+}
+
+#zip-inputs.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-hover);
+}
+
+.error-box {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px solid #fecaca;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Results Panel */
+.results-panel {
+    flex: 3;
+    min-width: 600px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.market-column {
+    flex: 1;
+}
+
+.market-column h4 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+/* Market List Items */
+.market-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.market-item span:first-child {
+    font-weight: 500;
+}
+
+.market-vals {
+    display: flex;
+    gap: 12px;
+}
+
+.prob-val { color: var(--text-muted); font-size: 0.85rem; }
+.odds-val { font-weight: 700; color: var(--primary-color); }
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Grids and Tables */
+.market-grid-layout {
+    display: flex;
+    gap: 20px;
+}
+
+.grid-section {
+    flex: 2;
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.side-markets {
+    flex: 1;
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    height: fit-content;
+}
+
+h5 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: var(--text-main);
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+.cs-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    table-layout: fixed;
+}
+
+.cs-table th, .cs-table td {
+    border: 1px solid var(--border-color);
+    text-align: center;
+    padding: 6px;
+    cursor: pointer;
+}
+
+.cs-table th {
+    background-color: var(--table-header-bg);
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 8px;
+    cursor: default;
+}
+
+.cs-table td:hover {
+    background-color: var(--cell-hover);
+}
+
+.cs-table td.selected {
+    background-color: var(--cell-selected) !important;
+    border: 2px solid var(--primary-color);
+}
+
+.warning-text {
+    font-size: 0.75rem;
+    color: #b91c1c;
+    margin-bottom: 8px;
+    height: 1.2em; /* Reserve space */
+}
+
+/* Selection Panel */
+.selection-panel {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.sel-title { font-weight: 700; color: var(--text-main); }
+.sel-data { font-size: 0.9rem; color: var(--text-muted); }
+.sel-data span { font-weight: 600; color: var(--primary-color); }
+
+/* Simple Table for Side Markets */
+.simple-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 20px;
+}
+
+.simple-table th { text-align: left; padding: 4px; border-bottom: 1px solid var(--border-color); }
+.simple-table td { padding: 4px; border-bottom: 1px solid #f1f5f9; }
+.simple-table td:last-child { text-align: right; font-weight: 600; }
+
+.market-dump h6 {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+    .app-layout { flex-direction: column; }
+    .input-panel { max-width: 100%; }
+    .market-grid-layout { flex-direction: column; }
+    .summary-card { flex-direction: column; gap: 10px; }
+}
