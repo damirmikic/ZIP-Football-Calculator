@@ -69,12 +69,7 @@ h1 { font-size: 1.5rem; font-weight: 700; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
 
-/* Grids */
-.market-grid-layout { display: flex; gap: 20px; }
-.grid-section { flex: 2; background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
-.side-markets { flex: 1; background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); height: fit-content; }
-
-/* New Full Width Layout for Full Time */
+/* Grids and Containers */
 .cs-grid-container {
     background: var(--card-bg);
     padding: 20px;
@@ -108,12 +103,11 @@ h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
 .stat-value.highlight { color: var(--primary-color); }
 .sel-list { font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; word-break: break-all; }
 
-/* Side tables */
+/* Tables */
 .simple-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin-bottom: 20px; }
 .simple-table th { text-align: left; padding: 4px; border-bottom: 1px solid var(--border-color); }
 .simple-table td { padding: 4px; border-bottom: 1px solid #f1f5f9; }
 .simple-table td:last-child { text-align: right; font-weight: 600; }
-.market-dump h6 { margin-top: 15px; margin-bottom: 8px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
 
 /* Markets Section - Card Grid Layout */
 .markets-section {
@@ -193,7 +187,6 @@ h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
 @media (max-width: 900px) {
     .app-layout { flex-direction: column; }
     .input-panel { max-width: 100%; }
-    .market-grid-layout { flex-direction: column; }
     .summary-card { flex-direction: column; gap: 10px; }
     .sel-stats { gap: 10px; }
 

@@ -509,56 +509,56 @@ function renderListMarkets(markets, context, margin, isFullTime) {
     // 1X2
     const p1x2 = [markets.homeWin, markets.draw, markets.awayWin];
     const a1x2 = applyMargin(p1x2, margin);
-    
+
     if (context.includes('summary')) {
         const el = document.getElementById('summary-1x2');
-        if(el) el.innerHTML = row(appState.inputs.homeTeam, p1x2[0], a1x2[0]) + 
-                              row('Draw', p1x2[1], a1x2[1]) + 
+        if(el) el.innerHTML = row(appState.inputs.homeTeam, p1x2[0], a1x2[0]) +
+                              row('Draw', p1x2[1], a1x2[1]) +
                               row(appState.inputs.awayTeam, p1x2[2], a1x2[2]);
-        
+
         // Summary OU
         const pO = markets.overs[2.5] || 0;
         const aOU = applyMargin([pO, 1-pO], margin);
         document.getElementById('summary-ou').innerHTML = row('Over 2.5', pO, aOU[0]) + row('Under 2.5', 1-pO, aOU[1]);
-        
+
         // Summary BTTS
         const pB = [markets.bttsYes, markets.bttsNo];
         const aB = applyMargin(pB, margin);
         document.getElementById('summary-btts').innerHTML = row('Yes', pB[0], aB[0]) + row('No', pB[1], aB[1]);
-        return; 
+        return;
     }
 
-    // Side Panels
+    if (isFullTime) {
+        // For Full Time, render into card-based layout
+        renderFullTimeMarketsToCards(markets, margin, row);
+        return;
+    }
+
+    // For H1 and H2, render into simple card layout
     const suffix = context.split('-')[1];
     const container = document.getElementById(`markets-${suffix}`);
     if (!container) return;
 
     let html = '';
-    
-    // 1X2 Section (Always show for all periods now)
-    html += `<h6>1X2 / Period Result</h6>`;
-    html += row('Home', p1x2[0], a1x2[0]);
+
+    // 1X2 Section
+    html += row('Home Win', p1x2[0], a1x2[0]);
     html += row('Draw', p1x2[1], a1x2[1]);
-    html += row('Away', p1x2[2], a1x2[2]);
+    html += row('Away Win', p1x2[2], a1x2[2]);
 
     // BTTS
     const pB = [markets.bttsYes, markets.bttsNo];
     const aB = applyMargin(pB, margin);
-    html += `<h6>Both Teams To Score</h6>${row('Yes', pB[0], aB[0])}${row('No', pB[1], aB[1])}`;
+    html += row('BTTS Yes', pB[0], aB[0]);
+    html += row('BTTS No', pB[1], aB[1]);
 
     // Goals
-    html += `<h6>Goal Lines</h6>`;
     STANDARD_LINES.forEach(line => {
         const pO = markets.overs[line] || 0;
         const aO = applyMargin([pO, 1-pO], margin);
-        html += row(`Over ${line}`, pO, aO[0]) + row(`Under ${line}`, 1-pO, aO[1]);
+        html += row(`Over ${line}`, pO, aO[0]);
+        html += row(`Under ${line}`, 1-pO, aO[1]);
     });
-
-    if (isFullTime) {
-        // For Full Time, render into new card-based layout
-        renderFullTimeMarketsToCards(markets, margin, row);
-        return;
-    }
 
     container.innerHTML = html;
 }

@@ -238,80 +238,92 @@
 
                 <!-- Tab Content: 1st Half -->
                 <div id="tab-h1" class="tab-content">
-                    <div class="market-grid-layout">
-                        <div class="grid-section">
-                            <h5>Correct Score Grid (1st Half)</h5>
-                            <div class="warning-text" id="warning-h1"></div>
-                            <div class="table-scroll">
-                                <table id="cs-grid-h1" class="cs-table"></table>
-                            </div>
-
-                            <!-- Custom Selection Panel -->
-                            <div id="selection-panel-h1" class="selection-panel hidden">
-                                <div class="sel-header">
-                                    <span class="sel-title">Custom Selection (<span id="sel-count-h1">0</span>)</span>
-                                    <button class="clear-btn" onclick="clearSelection('h1')">Clear</button>
-                                </div>
-                                <div class="sel-stats">
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Total Prob:</span>
-                                        <span class="stat-value" id="sel-prob-h1">0.00%</span>
-                                    </div>
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Fair Odds:</span>
-                                        <span class="stat-value" id="sel-fair-h1">-</span>
-                                    </div>
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Market Odds:</span>
-                                        <span class="stat-value highlight" id="sel-market-h1">-</span>
-                                    </div>
-                                </div>
-                                <div class="sel-list" id="sel-list-h1"></div>
-                            </div>
+                    <!-- Correct Score Grid Section -->
+                    <div class="cs-grid-container">
+                        <h5>Correct Score Grid (1st Half)</h5>
+                        <div class="warning-text" id="warning-h1"></div>
+                        <div class="table-scroll">
+                            <table id="cs-grid-h1" class="cs-table"></table>
                         </div>
-                        <div class="side-markets">
-                            <h5>Half Time Markets</h5>
-                            <div id="markets-h1" class="market-dump"></div>
+
+                        <!-- Custom Selection Panel -->
+                        <div id="selection-panel-h1" class="selection-panel hidden">
+                            <div class="sel-header">
+                                <span class="sel-title">Custom Selection (<span id="sel-count-h1">0</span>)</span>
+                                <button class="clear-btn" onclick="clearSelection('h1')">Clear</button>
+                            </div>
+                            <div class="sel-stats">
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Total Prob:</span>
+                                    <span class="stat-value" id="sel-prob-h1">0.00%</span>
+                                </div>
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Fair Odds:</span>
+                                    <span class="stat-value" id="sel-fair-h1">-</span>
+                                </div>
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Market Odds:</span>
+                                    <span class="stat-value highlight" id="sel-market-h1">-</span>
+                                </div>
+                            </div>
+                            <div class="sel-list" id="sel-list-h1"></div>
+                        </div>
+                    </div>
+
+                    <!-- Half Time Markets Section -->
+                    <div class="markets-section">
+                        <h4 class="section-title">Half Time Markets</h4>
+                        <div class="markets-grid">
+                            <div class="market-card">
+                                <h6 class="card-title">Period Markets</h6>
+                                <div id="markets-h1"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tab Content: 2nd Half -->
                 <div id="tab-h2" class="tab-content">
-                    <div class="market-grid-layout">
-                        <div class="grid-section">
-                            <h5>Correct Score Grid (2nd Half)</h5>
-                            <div class="warning-text" id="warning-h2"></div>
-                            <div class="table-scroll">
-                                <table id="cs-grid-h2" class="cs-table"></table>
-                            </div>
-
-                            <!-- Custom Selection Panel -->
-                            <div id="selection-panel-h2" class="selection-panel hidden">
-                                <div class="sel-header">
-                                    <span class="sel-title">Custom Selection (<span id="sel-count-h2">0</span>)</span>
-                                    <button class="clear-btn" onclick="clearSelection('h2')">Clear</button>
-                                </div>
-                                <div class="sel-stats">
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Total Prob:</span>
-                                        <span class="stat-value" id="sel-prob-h2">0.00%</span>
-                                    </div>
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Fair Odds:</span>
-                                        <span class="stat-value" id="sel-fair-h2">-</span>
-                                    </div>
-                                    <div class="sel-stat-item">
-                                        <span class="stat-label">Market Odds:</span>
-                                        <span class="stat-value highlight" id="sel-market-h2">-</span>
-                                    </div>
-                                </div>
-                                <div class="sel-list" id="sel-list-h2"></div>
-                            </div>
+                    <!-- Correct Score Grid Section -->
+                    <div class="cs-grid-container">
+                        <h5>Correct Score Grid (2nd Half)</h5>
+                        <div class="warning-text" id="warning-h2"></div>
+                        <div class="table-scroll">
+                            <table id="cs-grid-h2" class="cs-table"></table>
                         </div>
-                        <div class="side-markets">
-                            <h5>2nd Half Markets</h5>
-                            <div id="markets-h2" class="market-dump"></div>
+
+                        <!-- Custom Selection Panel -->
+                        <div id="selection-panel-h2" class="selection-panel hidden">
+                            <div class="sel-header">
+                                <span class="sel-title">Custom Selection (<span id="sel-count-h2">0</span>)</span>
+                                <button class="clear-btn" onclick="clearSelection('h2')">Clear</button>
+                            </div>
+                            <div class="sel-stats">
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Total Prob:</span>
+                                    <span class="stat-value" id="sel-prob-h2">0.00%</span>
+                                </div>
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Fair Odds:</span>
+                                    <span class="stat-value" id="sel-fair-h2">-</span>
+                                </div>
+                                <div class="sel-stat-item">
+                                    <span class="stat-label">Market Odds:</span>
+                                    <span class="stat-value highlight" id="sel-market-h2">-</span>
+                                </div>
+                            </div>
+                            <div class="sel-list" id="sel-list-h2"></div>
+                        </div>
+                    </div>
+
+                    <!-- 2nd Half Markets Section -->
+                    <div class="markets-section">
+                        <h4 class="section-title">2nd Half Markets</h4>
+                        <div class="markets-grid">
+                            <div class="market-card">
+                                <h6 class="card-title">Period Markets</h6>
+                                <div id="markets-h2"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
