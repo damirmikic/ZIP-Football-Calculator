@@ -101,17 +101,27 @@
                     </div>
 
                     <div class="input-group" style="margin-top: 10px;">
-                        <label>Halves Scaling Factor</label>
-                        <input type="number" id="halfFactor" step="0.01" min="0.3" max="0.7" value="0.50">
+                        <label title="Proportion of goals expected in 1st Half (Rest in 2nd)">1st Half Scaling Factor</label>
+                        <input type="number" id="halfFactor" step="0.01" min="0.3" max="0.7" value="0.45">
                     </div>
                 </div>
 
                 <!-- Margin -->
                 <div class="section">
-                    <h3>Market Settings</h3>
+                    <h3>Margins (%)</h3>
                     <div class="input-group">
-                        <label>Bookmaker Margin %</label>
-                        <input type="number" id="marginPct" step="0.5" value="6.0">
+                        <label>Full Time</label>
+                        <input type="number" id="marginFull" step="0.5" value="6.0">
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label>1st Half</label>
+                            <input type="number" id="marginH1" step="0.5" value="8.0">
+                        </div>
+                        <div class="input-group">
+                            <label>2nd Half</label>
+                            <input type="number" id="marginH2" step="0.5" value="8.0">
+                        </div>
                     </div>
                 </div>
 
@@ -157,12 +167,30 @@
                             <div class="table-scroll">
                                 <table id="cs-grid-full" class="cs-table"></table>
                             </div>
-                            <div id="selected-score-full" class="selection-panel hidden">
-                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
-                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
-                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
-                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+                            
+                            <!-- Custom Selection Panel -->
+                            <div id="selection-panel-full" class="selection-panel hidden">
+                                <div class="sel-header">
+                                    <span class="sel-title">Custom Selection (<span id="sel-count-full">0</span>)</span>
+                                    <button class="clear-btn" onclick="clearSelection('full')">Clear</button>
+                                </div>
+                                <div class="sel-stats">
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Total Prob:</span>
+                                        <span class="stat-value" id="sel-prob-full">0.00%</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Fair Odds:</span>
+                                        <span class="stat-value" id="sel-fair-full">-</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Market Odds:</span>
+                                        <span class="stat-value highlight" id="sel-market-full">-</span>
+                                    </div>
+                                </div>
+                                <div class="sel-list" id="sel-list-full"></div>
                             </div>
+
                         </div>
                         <div class="side-markets">
                             <h5>Additional Markets</h5>
@@ -182,11 +210,28 @@
                             <div class="table-scroll">
                                 <table id="cs-grid-h1" class="cs-table"></table>
                             </div>
-                            <div id="selected-score-h1" class="selection-panel hidden">
-                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
-                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
-                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
-                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+
+                            <!-- Custom Selection Panel -->
+                            <div id="selection-panel-h1" class="selection-panel hidden">
+                                <div class="sel-header">
+                                    <span class="sel-title">Custom Selection (<span id="sel-count-h1">0</span>)</span>
+                                    <button class="clear-btn" onclick="clearSelection('h1')">Clear</button>
+                                </div>
+                                <div class="sel-stats">
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Total Prob:</span>
+                                        <span class="stat-value" id="sel-prob-h1">0.00%</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Fair Odds:</span>
+                                        <span class="stat-value" id="sel-fair-h1">-</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Market Odds:</span>
+                                        <span class="stat-value highlight" id="sel-market-h1">-</span>
+                                    </div>
+                                </div>
+                                <div class="sel-list" id="sel-list-h1"></div>
                             </div>
                         </div>
                         <div class="side-markets">
@@ -205,11 +250,28 @@
                             <div class="table-scroll">
                                 <table id="cs-grid-h2" class="cs-table"></table>
                             </div>
-                            <div id="selected-score-h2" class="selection-panel hidden">
-                                <span class="sel-title">Selected: <span class="sel-score"></span></span>
-                                <span class="sel-data">Prob: <span class="sel-prob"></span></span>
-                                <span class="sel-data">Fair: <span class="sel-fair"></span></span>
-                                <span class="sel-data">Market: <span class="sel-market"></span></span>
+
+                            <!-- Custom Selection Panel -->
+                            <div id="selection-panel-h2" class="selection-panel hidden">
+                                <div class="sel-header">
+                                    <span class="sel-title">Custom Selection (<span id="sel-count-h2">0</span>)</span>
+                                    <button class="clear-btn" onclick="clearSelection('h2')">Clear</button>
+                                </div>
+                                <div class="sel-stats">
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Total Prob:</span>
+                                        <span class="stat-value" id="sel-prob-h2">0.00%</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Fair Odds:</span>
+                                        <span class="stat-value" id="sel-fair-h2">-</span>
+                                    </div>
+                                    <div class="sel-stat-item">
+                                        <span class="stat-label">Market Odds:</span>
+                                        <span class="stat-value highlight" id="sel-market-h2">-</span>
+                                    </div>
+                                </div>
+                                <div class="sel-list" id="sel-list-h2"></div>
                             </div>
                         </div>
                         <div class="side-markets">
