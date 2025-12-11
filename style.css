@@ -105,6 +105,16 @@ h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
 .simple-table td:last-child { text-align: right; font-weight: 600; }
 .market-dump h6 { margin-top: 15px; margin-bottom: 8px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
 
+/* Scores by Goals Breakdown */
+.scores-breakdown { margin-top: 15px; }
+.goal-group { margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 6px; }
+.goal-group h6 { margin: 0 0 10px 0; padding-bottom: 8px; border-bottom: 2px solid #dee2e6; color: #495057; font-weight: 600; }
+.score-list { display: flex; flex-direction: column; gap: 6px; }
+.score-item { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; padding: 6px 10px; background: white; border-radius: 4px; font-size: 0.9em; }
+.score-label { font-weight: 600; color: #495057; }
+.score-prob { color: #6c757d; text-align: center; }
+.score-odds { color: #198754; font-weight: 500; text-align: right; }
+
 /* Mobile */
 @media (max-width: 900px) {
     .app-layout { flex-direction: column; }

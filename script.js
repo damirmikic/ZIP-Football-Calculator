@@ -18,7 +18,11 @@ let appState = {
     jointFull: null,
     jointH1: null,
     jointH2: null,
-    inputs: null
+    inputs: null,
+    htftData: null,
+    scoresByGoals: null,
+    dcGoals: null,
+    result1X2Goals: null
 };
 
 // Store current selections for each grid: 'period' -> Set of "h-a" strings
@@ -272,6 +276,184 @@ function deriveMarkets(jointDist) {
     return m;
 }
 
+// Calculate Halftime/Full Time markets
+function deriveHalfTimeFullTime(jointH1, jointH2) {
+    const matrixH1 = jointH1.matrix;
+    const matrixH2 = jointH2.matrix;
+    const size = matrixH1.length;
+
+    // 9 possible outcomes: HT result / FT result
+    let htft = {
+        'H-H': 0, 'H-D': 0, 'H-A': 0,
+        'D-H': 0, 'D-D': 0, 'D-A': 0,
+        'A-H': 0, 'A-D': 0, 'A-A': 0
+    };
+
+    // Also track HT/FT with goal totals for combination markets
+    let htftGoals = {};
+    STANDARD_LINES.forEach(line => {
+        htftGoals[line] = {};
+        Object.keys(htft).forEach(key => {
+            htftGoals[line][key] = { over: 0, under: 0 };
+        });
+    });
+
+    // Iterate through all combinations of HT and 2H scores
+    for (let h1_h = 0; h1_h < size; h1_h++) {
+        for (let h1_a = 0; h1_a < size; h1_a++) {
+            const pHT = matrixH1[h1_h][h1_a];
+            if (pHT === 0) continue;
+
+            // Determine HT result
+            let htResult = h1_h > h1_a ? 'H' : h1_h === h1_a ? 'D' : 'A';
+
+            for (let h2_h = 0; h2_h < size; h2_h++) {
+                for (let h2_a = 0; h2_a < size; h2_a++) {
+                    const p2H = matrixH2[h2_h][h2_a];
+                    if (p2H === 0) continue;
+
+                    // Calculate full-time score
+                    const ft_h = h1_h + h2_h;
+                    const ft_a = h1_a + h2_a;
+                    const ftTotal = ft_h + ft_a;
+
+                    // Determine FT result
+                    let ftResult = ft_h > ft_a ? 'H' : ft_h === ft_a ? 'D' : 'A';
+
+                    // Combined probability (assuming independence)
+                    const prob = pHT * p2H;
+
+                    // Add to HT/FT market
+                    const key = `${htResult}-${ftResult}`;
+                    htft[key] += prob;
+
+                    // Add to HT/FT + Goals markets
+                    STANDARD_LINES.forEach(line => {
+                        if (ftTotal > line) {
+                            htftGoals[line][key].over += prob;
+                        } else {
+                            htftGoals[line][key].under += prob;
+                        }
+                    });
+                }
+            }
+        }
+    }
+
+    return { htft, htftGoals };
+}
+
+// Calculate Final Score grouped by total goals
+function deriveFinalScoreByGoals(jointDist) {
+    const matrix = jointDist.matrix;
+    const size = matrix.length;
+
+    let scoresByGoals = {};
+    for (let t = 0; t <= (size - 1) * 2; t++) {
+        scoresByGoals[t] = [];
+    }
+
+    for (let h = 0; h < size; h++) {
+        for (let a = 0; a < size; a++) {
+            const p = matrix[h][a];
+            const total = h + a;
+            scoresByGoals[total].push({
+                score: `${h}-${a}`,
+                prob: p
+            });
+        }
+    }
+
+    // Sort each group by probability descending
+    Object.keys(scoresByGoals).forEach(t => {
+        scoresByGoals[t].sort((a, b) => b.prob - a.prob);
+    });
+
+    return scoresByGoals;
+}
+
+// Calculate Double Chance + Goals combinations
+function deriveDoubleChanceGoals(markets) {
+    let dcGoals = {};
+
+    STANDARD_LINES.forEach(line => {
+        const pOver = markets.overs[line] || 0;
+        const pUnder = 1 - pOver;
+
+        dcGoals[line] = {
+            '1X': { over: 0, under: 0 },  // Home or Draw
+            'X2': { over: 0, under: 0 },  // Draw or Away
+            '12': { over: 0, under: 0 }   // Home or Away
+        };
+    });
+
+    const matrix = appState.jointFull.matrix;
+    const size = matrix.length;
+
+    for (let h = 0; h < size; h++) {
+        for (let a = 0; a < size; a++) {
+            const p = matrix[h][a];
+            const total = h + a;
+            const isHome = h > a;
+            const isDraw = h === a;
+            const isAway = h < a;
+
+            STANDARD_LINES.forEach(line => {
+                const isOver = total > line;
+
+                if (isHome || isDraw) {
+                    dcGoals[line]['1X'][isOver ? 'over' : 'under'] += p;
+                }
+                if (isDraw || isAway) {
+                    dcGoals[line]['X2'][isOver ? 'over' : 'under'] += p;
+                }
+                if (isHome || isAway) {
+                    dcGoals[line]['12'][isOver ? 'over' : 'under'] += p;
+                }
+            });
+        }
+    }
+
+    return dcGoals;
+}
+
+// Calculate 1X2 + Goals combinations
+function derive1X2Goals(markets) {
+    let result1X2Goals = {};
+
+    STANDARD_LINES.forEach(line => {
+        result1X2Goals[line] = {
+            'Home': { over: 0, under: 0 },
+            'Draw': { over: 0, under: 0 },
+            'Away': { over: 0, under: 0 }
+        };
+    });
+
+    const matrix = appState.jointFull.matrix;
+    const size = matrix.length;
+
+    for (let h = 0; h < size; h++) {
+        for (let a = 0; a < size; a++) {
+            const p = matrix[h][a];
+            const total = h + a;
+            const isHome = h > a;
+            const isDraw = h === a;
+            const isAway = h < a;
+
+            STANDARD_LINES.forEach(line => {
+                const isOver = total > line;
+                const bucket = isOver ? 'over' : 'under';
+
+                if (isHome) result1X2Goals[line]['Home'][bucket] += p;
+                else if (isDraw) result1X2Goals[line]['Draw'][bucket] += p;
+                else result1X2Goals[line]['Away'][bucket] += p;
+            });
+        }
+    }
+
+    return result1X2Goals;
+}
+
 function applyMargin(probs, marginPct) {
     const marginDecimal = marginPct / 100;
     const targetSum = 1 + marginDecimal;
@@ -294,6 +476,12 @@ function renderAllMarkets() {
     renderListMarkets(marketsFull, 'tab-full', marginFull, true);
     renderGrid('cs-grid-full', appState.jointFull, 'full', 'warning-full');
     updateSelectionPanel('full', marketsFull.map, marginFull);
+
+    // Calculate new combination markets
+    appState.htftData = deriveHalfTimeFullTime(appState.jointH1, appState.jointH2);
+    appState.scoresByGoals = deriveFinalScoreByGoals(appState.jointFull);
+    appState.dcGoals = deriveDoubleChanceGoals(marketsFull);
+    appState.result1X2Goals = derive1X2Goals(marketsFull);
 
     // H1
     const marketsH1 = deriveMarkets(appState.jointH1);
@@ -372,6 +560,53 @@ function renderListMarkets(markets, context, margin, isFullTime) {
         const aWTN = applyMargin(pWTN, margin);
         html += `<h6>Win to Nil</h6>` + row('Home', pWTN[0], aWTN[0]);
 
+        // Halftime/Full Time
+        if (appState.htftData) {
+            html += `<h6>Halftime / Full Time</h6>`;
+            const htftOrder = ['H-H', 'H-D', 'H-A', 'D-H', 'D-D', 'D-A', 'A-H', 'A-D', 'A-A'];
+            const htftLabels = {
+                'H-H': 'Home/Home', 'H-D': 'Home/Draw', 'H-A': 'Home/Away',
+                'D-H': 'Draw/Home', 'D-D': 'Draw/Draw', 'D-A': 'Draw/Away',
+                'A-H': 'Away/Home', 'A-D': 'Away/Draw', 'A-A': 'Away/Away'
+            };
+            const htftProbs = htftOrder.map(k => appState.htftData.htft[k]);
+            const htftAdjusted = applyMargin(htftProbs, margin);
+            htftOrder.forEach((k, i) => {
+                html += row(htftLabels[k], htftProbs[i], htftAdjusted[i]);
+            });
+        }
+
+        // Double Chance + Goals
+        if (appState.dcGoals) {
+            html += `<h6>Double Chance + Goals</h6>`;
+            const dcLabels = { '1X': 'Home or Draw', 'X2': 'Draw or Away', '12': 'Home or Away' };
+            [2.5].forEach(line => {
+                const dcData = appState.dcGoals[line];
+                ['1X', 'X2', '12'].forEach(dc => {
+                    const pOver = dcData[dc].over;
+                    const pUnder = dcData[dc].under;
+                    const adjusted = applyMargin([pOver, pUnder], margin);
+                    html += row(`${dcLabels[dc]} & Over ${line}`, pOver, adjusted[0]);
+                    html += row(`${dcLabels[dc]} & Under ${line}`, pUnder, adjusted[1]);
+                });
+            });
+        }
+
+        // 1X2 + Goals
+        if (appState.result1X2Goals) {
+            html += `<h6>Result + Goals</h6>`;
+            [2.5].forEach(line => {
+                const data = appState.result1X2Goals[line];
+                ['Home', 'Draw', 'Away'].forEach(result => {
+                    const pOver = data[result].over;
+                    const pUnder = data[result].under;
+                    const adjusted = applyMargin([pOver, pUnder], margin);
+                    html += row(`${result} & Over ${line}`, pOver, adjusted[0]);
+                    html += row(`${result} & Under ${line}`, pUnder, adjusted[1]);
+                });
+            });
+        }
+
         // Exact Goals Table
         const goalsTable = document.getElementById('goals-full');
         let gHtml = `<thead><tr><th>Total</th><th>Prob</th><th>Odds</th></tr></thead><tbody>`;
@@ -382,8 +617,47 @@ function renderListMarkets(markets, context, margin, isFullTime) {
             gHtml += `<tr><td>${t}</td><td>${formatProb(p)}</td><td>${formatOddsVal(odd)}</td></tr>`;
         }
         goalsTable.innerHTML = gHtml + `</tbody>`;
+
+        // Render Scores by Goals breakdown
+        if (appState.scoresByGoals) {
+            renderScoresByGoals(appState.scoresByGoals, margin);
+        }
     }
-    
+
+    container.innerHTML = html;
+}
+
+// Render Final Score by Goals breakdown
+function renderScoresByGoals(scoresByGoals, margin) {
+    const container = document.getElementById('scores-by-goals-full');
+    if (!container) return;
+
+    let html = '';
+    for (let total = 0; total <= MAX_GOALS; total++) {
+        const scores = scoresByGoals[total];
+        if (!scores || scores.length === 0) continue;
+
+        // Filter to show only scores with meaningful probability
+        const significantScores = scores.filter(s => s.prob > 0.001);
+        if (significantScores.length === 0) continue;
+
+        html += `<div class="goal-group">
+            <h6>${total} Goal${total !== 1 ? 's' : ''}</h6>
+            <div class="score-list">`;
+
+        significantScores.slice(0, 10).forEach(item => {
+            const adjustedProb = item.prob * (1 + margin/100);
+            const odds = getOdds(adjustedProb);
+            html += `<div class="score-item">
+                <span class="score-label">${item.score}</span>
+                <span class="score-prob">${formatProb(item.prob)}</span>
+                <span class="score-odds">${formatOddsVal(odds)}</span>
+            </div>`;
+        });
+
+        html += `</div></div>`;
+    }
+
     container.innerHTML = html;
 }
 
