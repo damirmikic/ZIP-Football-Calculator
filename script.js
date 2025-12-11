@@ -555,76 +555,105 @@ function renderListMarkets(markets, context, margin, isFullTime) {
     });
 
     if (isFullTime) {
-        // Extra full time markets
-        const pWTN = [markets.winToNilHome, 1-markets.winToNilHome];
-        const aWTN = applyMargin(pWTN, margin);
-        html += `<h6>Win to Nil</h6>` + row('Home', pWTN[0], aWTN[0]);
-
-        // Halftime/Full Time
-        if (appState.htftData) {
-            html += `<h6>Halftime / Full Time</h6>`;
-            const htftOrder = ['H-H', 'H-D', 'H-A', 'D-H', 'D-D', 'D-A', 'A-H', 'A-D', 'A-A'];
-            const htftLabels = {
-                'H-H': 'Home/Home', 'H-D': 'Home/Draw', 'H-A': 'Home/Away',
-                'D-H': 'Draw/Home', 'D-D': 'Draw/Draw', 'D-A': 'Draw/Away',
-                'A-H': 'Away/Home', 'A-D': 'Away/Draw', 'A-A': 'Away/Away'
-            };
-            const htftProbs = htftOrder.map(k => appState.htftData.htft[k]);
-            const htftAdjusted = applyMargin(htftProbs, margin);
-            htftOrder.forEach((k, i) => {
-                html += row(htftLabels[k], htftProbs[i], htftAdjusted[i]);
-            });
-        }
-
-        // Double Chance + Goals
-        if (appState.dcGoals) {
-            html += `<h6>Double Chance + Goals</h6>`;
-            const dcLabels = { '1X': 'Home or Draw', 'X2': 'Draw or Away', '12': 'Home or Away' };
-            [2.5].forEach(line => {
-                const dcData = appState.dcGoals[line];
-                ['1X', 'X2', '12'].forEach(dc => {
-                    const pOver = dcData[dc].over;
-                    const pUnder = dcData[dc].under;
-                    const adjusted = applyMargin([pOver, pUnder], margin);
-                    html += row(`${dcLabels[dc]} & Over ${line}`, pOver, adjusted[0]);
-                    html += row(`${dcLabels[dc]} & Under ${line}`, pUnder, adjusted[1]);
-                });
-            });
-        }
-
-        // 1X2 + Goals
-        if (appState.result1X2Goals) {
-            html += `<h6>Result + Goals</h6>`;
-            [2.5].forEach(line => {
-                const data = appState.result1X2Goals[line];
-                ['Home', 'Draw', 'Away'].forEach(result => {
-                    const pOver = data[result].over;
-                    const pUnder = data[result].under;
-                    const adjusted = applyMargin([pOver, pUnder], margin);
-                    html += row(`${result} & Over ${line}`, pOver, adjusted[0]);
-                    html += row(`${result} & Under ${line}`, pUnder, adjusted[1]);
-                });
-            });
-        }
-
-        // Exact Goals Table
-        const goalsTable = document.getElementById('goals-full');
-        let gHtml = `<thead><tr><th>Total</th><th>Prob</th><th>Odds</th></tr></thead><tbody>`;
-        for(let t=0; t<=MAX_GOALS; t++) {
-            const p = markets.exactTotals[t];
-            // Approx margin app for single outcome
-            const odd = getOdds(p * (1 + margin/100));
-            gHtml += `<tr><td>${t}</td><td>${formatProb(p)}</td><td>${formatOddsVal(odd)}</td></tr>`;
-        }
-        goalsTable.innerHTML = gHtml + `</tbody>`;
-
-        // Render Scores by Goals breakdown
-        if (appState.scoresByGoals) {
-            renderScoresByGoals(appState.scoresByGoals, margin);
-        }
+        // For Full Time, render into new card-based layout
+        renderFullTimeMarketsToCards(markets, margin, row);
+        return;
     }
 
     container.innerHTML = html;
+}
+
+// Render Full Time markets into card-based layout
+function renderFullTimeMarketsToCards(markets, margin, row) {
+    const p1x2 = [markets.homeWin, markets.draw, markets.awayWin];
+    const a1x2 = applyMargin(p1x2, margin);
+    const pB = [markets.bttsYes, markets.bttsNo];
+    const aB = applyMargin(pB, margin);
+
+    // Basic Markets Card
+    let basicHtml = '';
+    basicHtml += row('Home Win', p1x2[0], a1x2[0]);
+    basicHtml += row('Draw', p1x2[1], a1x2[1]);
+    basicHtml += row('Away Win', p1x2[2], a1x2[2]);
+    basicHtml += row('BTTS Yes', pB[0], aB[0]);
+    basicHtml += row('BTTS No', pB[1], aB[1]);
+
+    const pWTN = [markets.winToNilHome, 1-markets.winToNilHome];
+    const aWTN = applyMargin(pWTN, margin);
+    basicHtml += row('Win to Nil (Home)', pWTN[0], aWTN[0]);
+
+    STANDARD_LINES.forEach(line => {
+        const pO = markets.overs[line] || 0;
+        const aO = applyMargin([pO, 1-pO], margin);
+        basicHtml += row(`Over ${line}`, pO, aO[0]);
+        basicHtml += row(`Under ${line}`, 1-pO, aO[1]);
+    });
+    document.getElementById('basic-markets-full').innerHTML = basicHtml;
+
+    // Halftime/Full Time Card
+    if (appState.htftData) {
+        let htftHtml = '';
+        const htftOrder = ['H-H', 'H-D', 'H-A', 'D-H', 'D-D', 'D-A', 'A-H', 'A-D', 'A-A'];
+        const htftLabels = {
+            'H-H': 'Home/Home', 'H-D': 'Home/Draw', 'H-A': 'Home/Away',
+            'D-H': 'Draw/Home', 'D-D': 'Draw/Draw', 'D-A': 'Draw/Away',
+            'A-H': 'Away/Home', 'A-D': 'Away/Draw', 'A-A': 'Away/Away'
+        };
+        const htftProbs = htftOrder.map(k => appState.htftData.htft[k]);
+        const htftAdjusted = applyMargin(htftProbs, margin);
+        htftOrder.forEach((k, i) => {
+            htftHtml += row(htftLabels[k], htftProbs[i], htftAdjusted[i]);
+        });
+        document.getElementById('htft-markets-full').innerHTML = htftHtml;
+    }
+
+    // Double Chance + Goals Card
+    if (appState.dcGoals) {
+        let dcHtml = '';
+        const dcLabels = { '1X': 'Home or Draw', 'X2': 'Draw or Away', '12': 'Home or Away' };
+        [2.5].forEach(line => {
+            const dcData = appState.dcGoals[line];
+            ['1X', 'X2', '12'].forEach(dc => {
+                const pOver = dcData[dc].over;
+                const pUnder = dcData[dc].under;
+                const adjusted = applyMargin([pOver, pUnder], margin);
+                dcHtml += row(`${dcLabels[dc]} & Over ${line}`, pOver, adjusted[0]);
+                dcHtml += row(`${dcLabels[dc]} & Under ${line}`, pUnder, adjusted[1]);
+            });
+        });
+        document.getElementById('dc-goals-full').innerHTML = dcHtml;
+    }
+
+    // 1X2 + Goals Card
+    if (appState.result1X2Goals) {
+        let resultGoalsHtml = '';
+        [2.5].forEach(line => {
+            const data = appState.result1X2Goals[line];
+            ['Home', 'Draw', 'Away'].forEach(result => {
+                const pOver = data[result].over;
+                const pUnder = data[result].under;
+                const adjusted = applyMargin([pOver, pUnder], margin);
+                resultGoalsHtml += row(`${result} & Over ${line}`, pOver, adjusted[0]);
+                resultGoalsHtml += row(`${result} & Under ${line}`, pUnder, adjusted[1]);
+            });
+        });
+        document.getElementById('result-goals-full').innerHTML = resultGoalsHtml;
+    }
+
+    // Exact Goals Table
+    const goalsTable = document.getElementById('goals-full');
+    let gHtml = `<thead><tr><th>Total</th><th>Prob</th><th>Odds</th></tr></thead><tbody>`;
+    for(let t=0; t<=MAX_GOALS; t++) {
+        const p = markets.exactTotals[t];
+        const odd = getOdds(p * (1 + margin/100));
+        gHtml += `<tr><td>${t}</td><td>${formatProb(p)}</td><td>${formatOddsVal(odd)}</td></tr>`;
+    }
+    goalsTable.innerHTML = gHtml + `</tbody>`;
+
+    // Render Scores by Goals breakdown
+    if (appState.scoresByGoals) {
+        renderScoresByGoals(appState.scoresByGoals, margin);
+    }
 }
 
 // Render Final Score by Goals breakdown

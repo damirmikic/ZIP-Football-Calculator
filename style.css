@@ -73,6 +73,16 @@ h1 { font-size: 1.5rem; font-weight: 700; }
 .market-grid-layout { display: flex; gap: 20px; }
 .grid-section { flex: 2; background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); }
 .side-markets { flex: 1; background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); height: fit-content; }
+
+/* New Full Width Layout for Full Time */
+.cs-grid-container {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
 h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
 
 .table-scroll { overflow-x: auto; margin-bottom: 15px; }
@@ -105,6 +115,70 @@ h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
 .simple-table td:last-child { text-align: right; font-weight: 600; }
 .market-dump h6 { margin-top: 15px; margin-bottom: 8px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px dashed var(--border-color); padding-bottom: 2px; }
 
+/* Markets Section - Card Grid Layout */
+.markets-section {
+    margin-top: 20px;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-main);
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.markets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.market-card {
+    background: var(--card-bg);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.market-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.market-card.wide {
+    grid-column: span 2;
+}
+
+.card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin: 0 0 12px 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0f2fe;
+}
+
+.market-card .market-item {
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    background: #f8fafc;
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+}
+
+.market-card .market-item:hover {
+    background: #e0f2fe;
+    border-left-color: var(--primary-color);
+}
+
+.market-card .simple-table {
+    margin-bottom: 0;
+}
+
 /* Scores by Goals Breakdown */
 .scores-breakdown { margin-top: 15px; }
 .goal-group { margin-bottom: 20px; padding: 12px; background: #f8f9fa; border-radius: 6px; }
@@ -122,4 +196,12 @@ h5 { font-size: 1rem; margin-bottom: 12px; color: var(--text-main); }
     .market-grid-layout { flex-direction: column; }
     .summary-card { flex-direction: column; gap: 10px; }
     .sel-stats { gap: 10px; }
+
+    .markets-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .market-card.wide {
+        grid-column: span 1;
+    }
 }
